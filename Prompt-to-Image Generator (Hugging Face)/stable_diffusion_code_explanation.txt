@@ -1,0 +1,65 @@
+
+# Code Explanation: Stable Diffusion Image Generation Project
+
+1. **Installing necessary libraries:**
+```python
+!pip install transformers diffusers accelerate torch
+```
+   - Installs required libraries:
+     - `transformers`: For using Hugging Face models.
+     - `diffusers`: For diffusion-based models.
+     - `accelerate`: Optimizes computations.
+     - `torch`: PyTorch deep learning library.
+
+2. **Importing libraries:**
+```python
+from diffusers import StableDiffusionPipeline
+import torch
+```
+   - `StableDiffusionPipeline` is used to load and generate images using the Stable Diffusion model.
+   - `torch` is for managing tensor computations.
+
+3. **Loading the model:**
+```python
+def load_model():
+    model_id = "CompVis/stable-diffusion-v1-4"
+    pipe = StableDiffusionPipeline.from_pretrained(model_id)
+    pipe = pipe.to("cpu")  # Force it to use CPU
+    return pipe
+```
+   - Loads the Stable Diffusion model (`v1-4` version).
+   - The model is moved to the CPU for inference. If GPU is available, this can be modified to use the GPU.
+
+4. **Generating an image:**
+```python
+def generate_image(prompt: str, pipe, output_file: str = "generated_image.png"):
+    image = pipe(prompt).images[0]
+    image.save(output_file)
+    print(f"Image saved to {output_file}")
+```
+   - Generates an image from a text prompt.
+   - Saves the generated image to the specified file path.
+
+5. **Main execution block:**
+```python
+if __name__ == "__main__":
+    pipe = load_model()
+    prompt = "A serene mountain landscape at sunrise"
+    generate_image(prompt, pipe)
+```
+   - Loads the model, sets the prompt, and generates an image.
+
+6. **Displaying the image:**
+```python
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Load the image
+image = Image.open("generated_image.png")
+
+# Display the image using matplotlib
+plt.imshow(image)
+plt.axis("off")  # Hide axes
+plt.show()
+```
+   - Loads and displays the generated image using `matplotlib`.

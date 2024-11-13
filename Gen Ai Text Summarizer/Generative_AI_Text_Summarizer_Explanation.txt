@@ -1,0 +1,113 @@
+
+### Generative AI Text Summarizer Project - Code Explanation
+
+1. **Installation of Required Libraries**
+   ```python
+   pip install transformers torch requests PyMuPDF python-docx
+   ```
+   - Installs necessary libraries:
+     - `transformers`: For accessing pre-trained models like T5 for text summarization.
+     - `torch`: Supports the deep learning models used in the transformers library.
+     - `requests`: For making HTTP requests (though not explicitly used in the provided code).
+     - `PyMuPDF` (`fitz`): Used to read and extract text from PDF files.
+     - `python-docx`: Handles reading and writing `.docx` files.
+
+2. **Setting Environment Variables**
+   ```python
+   import os
+   os.environ['HF_HUB_DISABLE_SYMLINKS_WARNING'] = '1'
+   ```
+   - Imports the `os` library to interact with the operating system.
+   - Disables a specific warning related to Hugging Face Hub symlinks.
+
+3. **Importing Required Libraries**
+   ```python
+   from transformers import pipeline
+   from docx import Document
+   import fitz  # PyMuPDF for PDF handling
+   import os
+   ```
+   - `pipeline`: Utility from `transformers` to easily use a summarization model.
+   - `Document` from `python-docx`: Reads and writes `.docx` files.
+   - `fitz`: A module from `PyMuPDF` used for handling PDF files.
+
+4. **Function to Read Text from Files**
+   ```python
+   def read_text_from_file(file_path):
+       """
+       Reads text from .txt, .pdf, or .docx file.
+       """
+       content = ""
+       if file_path.endswith(".txt"):
+           with open(file_path, "r", encoding="utf-8") as file:
+               content = file.read()
+       elif file_path.endswith(".pdf"):
+           with fitz.open(file_path) as doc:
+               for page in doc:
+                   content += page.get_text()
+       elif file_path.endswith(".docx"):
+           doc = Document(file_path)
+           content = "\n".join([para.text for para in doc.paragraphs])
+       else:
+           raise ValueError("Unsupported file format. Please use .txt, .pdf, or .docx files.")
+       return content
+   ```
+   - Reads text from `.txt`, `.pdf`, and `.docx` files.
+   - Uses `fitz` for PDFs and `Document` for `.docx` files.
+   - Raises an error if the file format is not supported.
+
+5. **Function to Summarize Text**
+   ```python
+   def summarize_text(text, max_length=150, min_length=40):
+       """
+       Summarizes the given text using a T5 model.
+       """
+       summarization_pipeline = pipeline("summarization", model="t5-small")
+       summary = summarization_pipeline(text, max_length=max_length, min_length=min_length, do_sample=False)
+       return summary[0]['summary_text']
+   ```
+   - Uses a pre-trained T5 model for summarization.
+   - The `pipeline` is configured for summarization tasks.
+   - Outputs a summary within the specified length constraints.
+
+6. **Function to Save the Summary**
+   ```python
+   def save_summary_to_file(summary, original_file_path, output_path):
+       """
+       Saves the summary in the same format as the original file.
+       """
+       if original_file_path.endswith(".txt"):
+           with open(output_path, "w", encoding="utf-8") as file:
+               file.write(summary)
+       elif original_file_path.endswith(".pdf"):
+           doc = fitz.open()
+           doc.insert_page(-1, text=summary)
+           doc.save(output_path)
+       elif original_file_path.endswith(".docx"):
+           doc = Document()
+           doc.add_paragraph(summary)
+           doc.save(output_path)
+       else:
+           raise ValueError("Unsupported file format for saving.")
+   ```
+   - Saves the generated summary in the same format as the input file.
+   - Uses `fitz` for saving PDFs and `Document` for `.docx` files.
+
+7. **Example Usage of the Functions**
+   ```python
+   file_path = "sample_article (1).docx"  # Replace with your file path
+   try:
+       original_text = read_text_from_file(file_path)
+       print("Original Text Loaded.")
+       summary = summarize_text(original_text)
+       print("Summary Generated.")
+       output_file_path = f"summary_{os.path.basename(file_path)}"
+       save_summary_to_file(summary, file_path, output_file_path)
+       print(f"Summary saved at: {output_file_path}")
+   except Exception as e:
+       print(f"An error occurred: {e}")
+   ```
+   - Reads the content from a specified file.
+   - Generates a summary using the `summarize_text` function.
+   - Saves the summary using `save_summary_to_file`.
+   - Handles any exceptions that may occur during the process.

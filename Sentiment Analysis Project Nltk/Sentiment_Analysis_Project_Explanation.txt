@@ -1,0 +1,61 @@
+
+Sentiment Analysis Project - Code Explanation
+
+1. Import necessary libraries:
+   from textblob import TextBlob
+   import matplotlib.pyplot as plt
+   - TextBlob: A library for processing textual data, used here for sentiment analysis.
+   - matplotlib.pyplot: A library for creating visualizations, used here for plotting graphs.
+
+2. Define a list of texts for sentiment analysis:
+   texts = [
+       "I love programming, it's so much fun!",
+       "I'm not a fan of this rainy weather.",
+       "The movie was okay, not great but not terrible either.",
+       "This product is absolutely amazing!",
+       "I hate being stuck in traffic."
+   ]
+   - A list of sample texts to analyze for sentiment.
+
+3. Initialize empty lists to store polarity and subjectivity values:
+   polarities = []
+   subjectivities = []
+   - polarities: Will store the polarity (positivity/negativity) of each text.
+   - subjectivities: Will store the subjectivity (objectivity/subjectivity) of each text.
+
+4. Perform sentiment analysis on each text:
+   for text in texts:
+       blob = TextBlob(text)
+       sentiment = blob.sentiment
+       polarities.append(sentiment.polarity)
+       subjectivities.append(sentiment.subjectivity)
+   - TextBlob(text): Creates a TextBlob object for the given text.
+   - blob.sentiment: Analyzes the sentiment of the text, returning polarity and subjectivity.
+   - polarity: Ranges from -1 (negative) to 1 (positive).
+   - subjectivity: Ranges from 0 (objective) to 1 (subjective).
+
+5. Print the sentiment analysis results:
+   for i, text in enumerate(texts):
+       print(f"Text: {text}")
+       print(f"Polarity: {polarities[i]}, Subjectivity: {subjectivities[i]}\n")
+   - Loops through each text and prints its corresponding polarity and subjectivity.
+
+6. Create a bar plot for polarity visualization:
+   plt.figure(figsize=(8, 5))
+   plt.barh(range(len(texts)), polarities, color=['green' if p > 0 else 'red' for p in polarities])
+   plt.yticks(range(len(texts)), texts)
+   plt.xlabel('Sentiment Polarity')
+   plt.title('Sentiment Analysis (Polarity) of Sample Texts')
+   plt.show()
+   - plt.barh(): Creates a horizontal bar plot.
+   - Colors each bar green if polarity is positive, red if negative.
+   - Labels the y-axis with the text samples and shows the plot.
+
+7. Create a bar plot for subjectivity visualization:
+   plt.figure(figsize=(8, 5))
+   plt.barh(range(len(texts)), subjectivities, color='blue')
+   plt.yticks(range(len(texts)), texts)
+   plt.xlabel('Subjectivity (0 = Objective, 1 = Subjective)')
+   plt.title('Subjectivity Analysis of Sample Texts')
+   plt.show()
+   - Creates another horizontal bar plot, this time for subjectivity, where all bars are blue.
